@@ -1,16 +1,18 @@
 import React from 'react'
 import Place from './Place'
+import '../styling/Places.css'
 
 class PlacesList extends React.Component {
 
     constructor() {
         super();
-        this.state = { places : [], input: ''};
-        
+        this.state = { places : [], input: '', page: 0, next_places: []};
+        this.handleNext = this.handleNext.bind(this);
+        this.handlePrevious = this.handlePrevious.bind(this);
     }
 
     componentDidMount(){
-        fetch("http://localhost:8000/search?text=brussel")
+        fetch("http://localhost:8000/search?text=brussel&page=0")
             .then(response => response.json())
             .then(json => {this.setState({places: json['results']})})
             .catch(error => console.log(error));
@@ -31,34 +33,57 @@ class PlacesList extends React.Component {
         } 
         
         return <div>
-            <form action='/' method="get">
+            <form>
             <input
                 type="text"
+                placeholder="search places"
                 onChange= {this.handleChange}
                 >
             </input>
             </form>
+            <div id="outer">
+                <div class="inner"><button type="submit" onClick={this.handlePrevious} >Previous</button></div>
+                <div class="inner"><button type="submit" onClick={this.handleNext}>Next</button></div>
+            </div>
             {result}
         </div>;
         
     }
 
-    handleSubmit(e) {
-        //fetch("http://localhost:8000/search?text=Leuven")
-         //   .then(response => response.json())
-          //  .then(json => {this.setState({places: json['results']})});
-          this.setState({places: []})
-        
+    handlePrevious(){
+        if (this.state.page > 0){
+            this.setState({page: this.state.page - 1})
+            this.refreshPlaces()
+        }
+    }
+
+    handleNext(){
+        let url = this.getUrl()
+        fetch(url)
+            .then(response => response.json())
+            .then(json => {this.setState({next_places: json['results']})});
+        if (this.state.next_places.length !== 0){
+            this.setState({page: this.state.page + 1, next_places: []})
+            this.refreshPlaces()
+        }
     }
 
     handleChange = (e) => {
         let search_text = e.target.value
-        let url = "http://localhost:8000/search?text=" + search_text
+        this.setState({input: search_text})
+        this.refreshPlaces()
+        console.log(search_text)
+    }
+
+    refreshPlaces(){
+        let url = this.getUrl()
         fetch(url)
             .then(response => response.json())
             .then(json => {this.setState({places: json['results']})});
-        this.setState({input: search_text})
-        console.log(search_text)
+    }
+
+    getUrl(){
+        return "http://localhost:8000/search?text=" + this.state.input + "&page=" + this.state.page
     }
 }
 

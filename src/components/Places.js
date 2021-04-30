@@ -6,7 +6,7 @@ class Places extends React.Component {
 
     render() {
         return <div>
-            <h2>Places</h2>
+            <h2>Search for places</h2>
             <PlacesList />
         </div>;
     }

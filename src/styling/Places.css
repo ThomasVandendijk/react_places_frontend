@@ -1,4 +1,18 @@
 h2 { 
-    color: red;
+    color: black;
     text-align: center;
+}
+
+form {
+    text-align: center;
+}
+
+#outer
+{
+    width:100%;
+    text-align: center;
+}
+.inner
+{
+    display: inline-block;
 }
